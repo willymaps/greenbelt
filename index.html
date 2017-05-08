@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'/>
+<title>Switcher</title>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.css' rel='stylesheet' />
+<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+
+</head>
+
+<style>
+
+body {
+	font-family: Open Sans, arial, sans-serif;
+    margin:0;
+    padding:0;
+/*    background:#000;*/
+    -webkit-text-size-adjust: 100%;
+}
+
+canvas {
+  outline: none;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+}
+
+.wrapper {
+	display: block;
+	max-width:800px;
+	margin:0 auto;
+}
+
+.btnholder {
+	display: block;
+	margin:0 auto;
+	text-align: center;
+	padding:20px 0;
+	z-index:1;
+}
+
+.btnholder div {
+	color:#999;
+	width:50px;
+	font-size: 12px;
+	background:#efefef;
+	padding:7px;
+	text-align: center;
+	display: inline-block;
+	border: 0.5px solid #cacaca;
+	box-shadow: 0.5px 0.5px 5px rgba(0,0,0,0.1);
+}
+
+.btnholder div:hover {
+	background:#d3d3d3;
+	cursor:pointer;
+}
+
+#map {
+	height:550px;
+	width:100%;
+}
+
+/*#map { position:absolute; top:0; bottom:0; width:100%; }*/
+
+.btnholder div.active {
+	font-weight:bold;
+	color:#333;
+	background: #fff;
+}
+
+.imgnotes {
+	margin:5px 0;
+}
+
+.imgnotes p {
+	text-align:left;
+	font-size:10px;
+	margin:0px; 
+}
+
+@media (max-width:500px) {
+    #map {
+        height: 300px;
+    }
+}
+
+
+</style>
+
+<body>
+<div class="wrapper">
+	<div class="btnholder">
+		<div id="btnone" class="active" onclick="yaClicked()">2005</div>
+		<div id="btntwo" onclick="yaClicked()">2016</div>
+	</div>
+
+	<div id="map">
+<!-- 		<img src="test.png" alt=""> -->
+	</div>
+
+	<div class="imgnotes">
+		<p>Note:</p>
+		<p>Source: Statistics Canada</p>
+	</div>
+</div>
+
+<script>
+
+// BTN stuff
+
+var btnone = document.getElementById("btnone");
+var btntwo = document.getElementById("btntwo");
+
+
+function showOne() {
+        btnone.classList.remove('active');
+        btntwo.classList.add('active');
+        map.setPaintProperty('newroads', 'line-opacity', 1);
+        map.setPaintProperty('oldroads', 'line-opacity', 0);
+};
+
+function showTwo() {
+        btnone.classList.add('active');
+        btntwo.classList.remove('active');
+        map.setPaintProperty('newroads', 'line-opacity', 0);
+        map.setPaintProperty('oldroads', 'line-opacity', 1);
+}
+
+function yaClicked() {
+	if (btnone.classList.contains('active')) {
+        showOne();
+	} else {
+        showTwo();
+	}
+};
+
+var bounds = [
+    [-81.7,43.0], // Southwest coordinates
+    [-77.9,45.3]  // Northeast coordinates
+];
+
+
+// MAP STUFF
+
+mapboxgl.accessToken = 'pk.eyJ1IjoidHdlYXRoZXJidXJuIiwiYSI6IllqeWNoS28ifQ.LX7mJDglVdZODqd25Z8aeg';
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/empty-v8',
+    zoom: 8,
+    maxZoom:12,
+    minZoom:6,
+    pitch:45,
+    bearing:-40,
+    maxBounds: bounds,
+    center: [-79.445126, 43.577940]
+});
+
+map.scrollZoom.disable();
+map.dragPan.disable();
+
+map.on('zoom', function() {
+    if (map.getZoom() >= 8.1) {
+        map.dragPan.enable();
+    } else {
+        map.dragPan.disable();
+    }
+});
+
+map.on('load', function () {
+
+    map.addSource('newroads', {
+        type: 'vector',
+        url: 'mapbox://tweatherburn.3zx7n87c'
+    });
+    map.addLayer({
+        'id': 'newroads',
+        'type': 'line',
+        'source': 'newroads',
+        'source-layer': '2016_simp-51ap32',
+        'layout': {
+            'visibility': 'visible',
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': '#EB5200',
+            'line-width': 0.5,
+            'line-opacity': 0.01
+        }
+    });
+
+    map.addSource('oldroads', {
+        type: 'vector',
+        url: 'mapbox://tweatherburn.6o4it0iy'
+    });
+    map.addLayer({
+        'id': 'oldroads',
+        'type': 'line',
+        'source': 'oldroads',
+        'source-layer': '2005_simp-6508dk',
+        'layout': {
+            'visibility': 'visible',
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        'paint': {
+            'line-color': '#00A8A3',
+            'line-width': 0.5
+        }
+    });
+
+    map.addSource('poi', {
+            type: 'vector',
+            url: 'mapbox://tweatherburn.07y1gd5p'
+    });
+    map.addLayer({
+	        "id": "poi",
+	        "type": "circle",
+	        "source": "poi",
+	        "source-layer": "pois-2iqt4m",
+	        'layout': {
+	            'visibility': 'visible'
+	        },
+	        'paint': {
+	            "circle-radius": {
+	                'property': "circsize",
+	                'type': "identity"
+	            },
+	            "circle-color": "rgba(255,255,255,0)",
+	            "circle-stroke-width": 2,
+	            "circle-stroke-color": "#555555",
+                "circle-stroke-opacity": 0.85
+
+	        }
+    });
+
+
+    map.addSource("popData", {
+        'type': 'geojson',
+        'data': 'geojson/towndata.geojson'
+    });
+
+    // STYLE POINTLABELS
+    map.addLayer({
+        "id": "poplabels",
+        "type": "symbol",
+        "source": "popData",
+        "layout": {
+            "visibility": "visible",
+            "text-field": "{townname}",
+            "text-font": ["Open Sans Regular", "Arial Unicode MS Bold"],
+            "text-size": 10,
+            "text-offset": [1.2, 0],
+            "text-anchor": "top"
+        },
+        "paint": {
+            "text-color": "#555"
+        }
+    });
+
+});
+
+
+    var width = document.documentElement.clientWidth;
+
+    // function getZoom(width) {
+    //         if (width > 550) {
+    //                 return 8;
+    //         }  else {
+    //                 return 6;
+    //         }
+    // };
+
+    // map.on('click', 'poi', function (e) {
+    //     map.flyTo({
+    //     	center: e.features[0].geometry.coordinates,
+    //     	zoom:12,
+    //     	pitch:0,
+    //     	speed:0.5
+    //     });
+    // });
+
+    map.on('click', function(e) {
+        var features = map.queryRenderedFeatures(e.point, { layers: ['poi'] });
+        if (features.length) {
+            map.flyTo({
+                center: features[0].geometry.coordinates,
+                zoom:11,
+                pitch:0,
+                bearing:0,
+                speed:0.5
+            }, map.setPaintProperty('poi', 'circle-stroke-opacity', 0));
+            setTimeout(function(){
+                if (btnone.classList.contains('active')) {
+                    showOne();
+                } else {
+                    showTwo();
+                }
+            }, 2000);
+        } else {
+            map.flyTo({
+                center: [-79.445126, 43.577940],
+                bearing:0,
+                pitch:0,
+                zoom:8
+            });
+            map.setPaintProperty('poi', 'circle-stroke-opacity', 0.85);
+        }
+    });
+
+// map.on('render', function () {
+// 	map.setPaintProperty('newroads', 'line-opacity', 0);
+// });
+
+</script>
+
+
+</body>
+</html>
