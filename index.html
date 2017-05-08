@@ -148,7 +148,7 @@ var map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/empty-v8',
     zoom: 8,
     maxZoom:12,
-    minZoom:6,
+    minZoom:7,
     pitch:45,
     bearing:-40,
     maxBounds: bounds,
@@ -263,22 +263,13 @@ map.on('load', function () {
 
     var width = document.documentElement.clientWidth;
 
-    // function getZoom(width) {
-    //         if (width > 550) {
-    //                 return 8;
-    //         }  else {
-    //                 return 6;
-    //         }
-    // };
-
-    // map.on('click', 'poi', function (e) {
-    //     map.flyTo({
-    //     	center: e.features[0].geometry.coordinates,
-    //     	zoom:12,
-    //     	pitch:0,
-    //     	speed:0.5
-    //     });
-    // });
+    function getZoom(width) {
+            if (width > 550) {
+                    return 8;
+            }  else {
+                    return 7.2;
+            }
+    };
 
     map.on('click', function(e) {
         var features = map.queryRenderedFeatures(e.point, { layers: ['poi'] });
@@ -307,10 +298,6 @@ map.on('load', function () {
             map.setPaintProperty('poi', 'circle-stroke-opacity', 0.85);
         }
     });
-
-// map.on('render', function () {
-// 	map.setPaintProperty('newroads', 'line-opacity', 0);
-// });
 
 </script>
 
