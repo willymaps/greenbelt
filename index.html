@@ -39,9 +39,9 @@ canvas {
 
 .btnholder div {
 	color:#999;
-	width:50px;
-	font-size: 12px;
-	background:#efefef;
+	width:80px;
+	font-size: 14px;
+	background:#ffffff;
 	padding:7px;
 	text-align: center;
 	display: inline-block;
@@ -49,19 +49,13 @@ canvas {
 }
 
 .btnholder div:hover {
-	background:#d3d3d3;
+	background:#efefef;
 	cursor:pointer;
 }
 
 #map {
 	height:560px;
 	width:100%;
-}
-
-.btnholder div.active {
-	font-weight:bold;
-	color:#333;
-	background: #fff;
 }
 
 .imgnotes {
@@ -85,7 +79,6 @@ canvas {
 <div class="wrapper">
 	<div class="btnholder">
 		<div id="btnone" class="active" onclick="yaClicked()">2005</div>
-		<div id="btntwo" onclick="yaClicked()">2016</div>
 	</div>
 
 	<div id="map">
@@ -100,19 +93,15 @@ canvas {
 // BTN stuff
 
 var btnone = document.getElementById("btnone");
-var btntwo = document.getElementById("btntwo");
-
 
 function showOne() {
         btnone.classList.remove('active');
-        btntwo.classList.add('active');
         map.setPaintProperty('newroads', 'line-opacity', 1);
         map.setPaintProperty('oldroads', 'line-opacity', 0);
 };
 
 function showTwo() {
         btnone.classList.add('active');
-        btntwo.classList.remove('active');
         map.setPaintProperty('newroads', 'line-opacity', 0);
         map.setPaintProperty('oldroads', 'line-opacity', 1);
 }
@@ -120,8 +109,10 @@ function showTwo() {
 function yaClicked() {
 	if (btnone.classList.contains('active')) {
         showOne();
+        btnone.innerHTML = '2016';
 	} else {
         showTwo();
+        btnone.innerHTML = '2005';
 	}
 };
 
